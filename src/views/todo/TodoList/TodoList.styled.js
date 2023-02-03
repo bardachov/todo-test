@@ -15,7 +15,7 @@ export const List = styled.ul`
     width: 100%;
     justify-content: space-between;
 
-    > * {
+    > div {
       width: 100px;
     }
   }
