@@ -1,5 +1,11 @@
 import { data } from './mock';
-import { Button, Stack, Switch } from '@mui/material';
+import {
+  Button,
+  Stack,
+  Switch,
+  Autocomplete,
+  TextField,
+} from '@mui/material';
 import { useState } from 'react';
 import { List, TodoItem, ControlsContainer } from './TodoList.styled';
 import { TodoForm } from '../TodoForm';
@@ -7,6 +13,7 @@ import { icons } from '../constants';
 
 export const TodoList = () => {
   const [todo, setTodo] = useState(data);
+  const [filter, setFilter] = useState();
   const [isFormVisible, setFormVisible] = useState(false);
 
   const getIconUrl = (id) => {
@@ -42,6 +49,55 @@ export const TodoList = () => {
 
   const isDeleteVisible = () => todo.find((el) => el.isSelected);
 
+  const ToDo = () => {
+    const todolist = filter
+      ? todo.filter((element) => element.name.includes(filter.name))
+      : todo;
+
+    return todolist.map((item) => {
+      return (
+        <TodoItem
+          key={item.id}
+          onClick={() => {
+            selectItem(item.id);
+          }}
+          isSelected={item.isSelected}
+        >
+          <div style={{ paddingLeft: 15 }}>
+            <Switch defaultValue="checked" />
+          </div>
+          <div>
+            <span>{item.sku}</span>
+          </div>
+          <div>
+            <span>{item.id}</span>
+          </div>
+          <div
+            style={{
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {getIconUrl(item.iconID) && (
+              <img src={getIconUrl(item.iconID)} alt={item.name} />
+            )}
+
+            <span style={{ whiteSpace: 'nowrap' }}>{item.name}</span>
+          </div>
+          <Button
+            onClick={() => {
+              setTodo((todo) =>
+                todo.filter(({ id }) => item.id !== id)
+              );
+            }}
+          >
+            x
+          </Button>
+        </TodoItem>
+      );
+    });
+  };
+
   return (
     <Stack alignItems="center" sx={{ mt: 5 }}>
       <div style={{ width: 700, height: 500 }}>
@@ -50,7 +106,23 @@ export const TodoList = () => {
             <span>Статус</span>
             <span>Товар</span>
             <span>ID</span>
-            <span>Название</span>
+
+            <div>
+              <span>Название</span>
+              <Autocomplete
+                sx={{ width: 200 }}
+                size="small"
+                options={todo}
+                getOptionLabel={(option) => option.name}
+                renderInput={(params) => (
+                  <TextField {...params} variant="standard" />
+                )}
+                onChange={(event, newInputValue) => {
+                  setFilter(newInputValue);
+                }}
+              />
+            </div>
+
             <ControlsContainer>
               <Button
                 onClick={showNewForm}
@@ -81,54 +153,7 @@ export const TodoList = () => {
               <TodoForm submitHandler={addTodo} />
             </li>
           )}
-
-          {todo.map((item) => {
-            return (
-              <TodoItem
-                key={item.id}
-                onClick={() => {
-                  selectItem(item.id);
-                }}
-                isSelected={item.isSelected}
-              >
-                <div style={{ paddingLeft: 15 }}>
-                  <Switch defaultValue="checked" />
-                </div>
-                <div>
-                  <span>{item.sku}</span>
-                </div>
-                <div>
-                  <span>{item.id}</span>
-                </div>
-                <div
-                  style={{
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}
-                >
-                  {getIconUrl(item.iconID) && (
-                    <img
-                      src={getIconUrl(item.iconID)}
-                      alt={item.name}
-                    />
-                  )}
-
-                  <span style={{ whiteSpace: 'nowrap' }}>
-                    {item.name}
-                  </span>
-                </div>
-                <Button
-                  onClick={() => {
-                    setTodo((todo) =>
-                      todo.filter(({ id }) => item.id !== id)
-                    );
-                  }}
-                >
-                  x
-                </Button>
-              </TodoItem>
-            );
-          })}
+          <ToDo />
         </List>
       </div>
     </Stack>
