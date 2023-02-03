@@ -1,7 +1,7 @@
 import { data } from './mock';
 import { Button, Stack, Switch } from '@mui/material';
 import { useState } from 'react';
-import { List } from './TodoList.styled';
+import { List, TodoItem, ControlsContainer } from './TodoList.styled';
 import { TodoForm } from '../TodoForm';
 import { icons } from '../constants';
 
@@ -26,16 +26,32 @@ export const TodoList = () => {
     setFormVisible(!isFormVisible);
   };
 
+  const selectItem = (id) => {
+    setTodo((todo) => {
+      return todo.map((item) => {
+        const newItem = { ...item };
+
+        if (item.id === id) {
+          newItem.isSelected = !newItem.isSelected;
+        }
+
+        return newItem;
+      });
+    });
+  };
+
+  const isDeleteVisible = () => todo.find((el) => el.isSelected);
+
   return (
     <Stack alignItems="center" sx={{ mt: 5 }}>
       <div style={{ width: 700, height: 500 }}>
         <List>
-          <li>
+          <li style={{ height: '73px' }}>
             <span>Статус</span>
             <span>Товар</span>
             <span>ID</span>
             <span>Название</span>
-            <div>
+            <ControlsContainer>
               <Button
                 onClick={showNewForm}
                 variant="contained"
@@ -43,7 +59,21 @@ export const TodoList = () => {
               >
                 +
               </Button>
-            </div>
+
+              {isDeleteVisible() && (
+                <Button
+                  variant="contained"
+                  size="small"
+                  onClick={() => {
+                    setTodo((todo) =>
+                      todo.filter((item) => !item.isSelected)
+                    );
+                  }}
+                >
+                  x
+                </Button>
+              )}
+            </ControlsContainer>
           </li>
 
           {isFormVisible && (
@@ -54,8 +84,14 @@ export const TodoList = () => {
 
           {todo.map((item) => {
             return (
-              <li key={item.id}>
-                <div>
+              <TodoItem
+                key={item.id}
+                onClick={() => {
+                  selectItem(item.id);
+                }}
+                isSelected={item.isSelected}
+              >
+                <div style={{ paddingLeft: 15 }}>
                   <Switch defaultValue="checked" />
                 </div>
                 <div>
@@ -81,8 +117,16 @@ export const TodoList = () => {
                     {item.name}
                   </span>
                 </div>
-                <Button>x</Button>
-              </li>
+                <Button
+                  onClick={() => {
+                    setTodo((todo) =>
+                      todo.filter(({ id }) => item.id !== id)
+                    );
+                  }}
+                >
+                  x
+                </Button>
+              </TodoItem>
             );
           })}
         </List>
