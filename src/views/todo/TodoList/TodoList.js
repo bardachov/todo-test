@@ -150,7 +150,10 @@ export const TodoList = () => {
 
           {isFormVisible && (
             <li>
-              <TodoForm submitHandler={addTodo} />
+              <TodoForm
+                submitHandler={addTodo}
+                disabledIds={todo.map((item) => item.id)}
+              />
             </li>
           )}
           <ToDo />

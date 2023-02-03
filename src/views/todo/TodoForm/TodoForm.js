@@ -1,14 +1,28 @@
 import { Switch } from '@mui/material';
+import { style } from '@mui/system';
 import { useRef, useState } from 'react';
 import { icons } from '../constants';
 import { Form } from './TodoForm.styled';
 
-export const TodoForm = ({ submitHandler }) => {
+export const TodoForm = ({ submitHandler, disabledIds }) => {
   const nameRef = useRef();
   const [valueID, setID] = useState('');
+  const [validated, setValidated] = useState(true);
 
   const applyId = (e) => {
-    if (e.target.value < 1000) setID(e.target.value);
+    if (
+      e.target.value < 1000 &&
+      !disabledIds.includes(Number(e.target.value))
+    )
+      setID(e.target.value);
+
+    // if (e.target.value < 1000) setID(e.target.value);
+
+    // if (disabledIds.includes(Number(e.target.value))) {
+    //   setValidated(false);
+    // } else {
+    //   setValidated(true);
+    // }
   };
 
   const applyName = (e) => {
